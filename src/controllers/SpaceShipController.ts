@@ -1,27 +1,23 @@
-/**
- * @class SpaceShipController
- * @desc Responsible for handling API requests for the
- * SpaceShip routes.
- **/
-
 import * as express from 'express';
-import { Request, Response } from 'express';
-import { ISpaceShipRepo } from '../repositories/SpaceShipRepo';
+import { Request, Response, Router } from 'express';
 import { BaseController } from './BaseController';
 
 export class SpaceShipController extends BaseController {
-    private spaceShipRepo: ISpaceShipRepo;
+    public path: string;
+    public router: Router;
 
-    constructor (spaceShipRepo: ISpaceShipRepo) {
+    constructor() {
         super();
-        this.spaceShipRepo = spaceShipRepo;
+        this.path = `/space-ship`;
+        this.router = Router();
+        this.initializeRoutes();
     }
 
-    protected async executeImpl(req: Request, res: Response): Promise<void | any> {
-        try {
+    private initializeRoutes(): void {
+        this.router.get( this.path, this.getSpaceShips );
+    }
 
-        } catch(err) {
-            return this.fail(res, err.toString());
-        }
+    getSpaceShips = ( req: Request, res: Response ) => {
+        return this.ok<any>( res );
     }
 }
