@@ -3,7 +3,9 @@ import * as mongoose from 'mongoose';
 
 import { Application } from 'express';
 import { json, urlencoded } from 'body-parser';
-import logger from './middlewares/logger';
+import { url as dbUrl, connectionParams } from './config/db';
+import loggerMiddleWare from './middlewares/logger';
+import errorMiddleware from './middlewares/error';
 
 export default class App {
     public app: Application;
@@ -16,44 +18,33 @@ export default class App {
         this.connectDB();
         this.initializeMiddlewares();
         this.initializeControllers( controllers );
+        this.initializeErrorHandling();
     }
 
     private initializeMiddlewares() {
         this.app.use( json() );
         this.app.use( urlencoded( { extended: false } ) );
-        this.app.use( logger );
+        this.app.use( loggerMiddleWare );
     }
 
     private initializeControllers( controllers: any ) {
         controllers.forEach( ( controller ) => {
-            console.log( 'controller', controller.path );
             this.app.use( this.baseUrl, controller.router );
         } );
     }
 
+    private initializeErrorHandling() {
+        this.app.use( errorMiddleware )
+    }
+
     private connectDB() {
-        const {
-            MONGO_USER: dbUser,
-            MONGO_PASSWORD: dbPass,
-            MONGO_DB_NAME: dbName
-        } = process.env;
-        if ( !!dbUser && !!dbPass && !!dbName ) {
-            const url = `mongodb+srv://${dbUser}:${dbPass}@cluster0.hmf53.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-
-            const connectionParams = {
-                useNewUrlParser: true,
-                useCreateIndex: true,
-                useUnifiedTopology: true
-            }
-
-            mongoose.connect( url, connectionParams )
-                .then( () => {
-                    console.log( 'Connected to database ' )
-                } )
-                .catch( ( err ) => {
-                    console.error( `Error connecting to the database. \n${err}` );
-                } );
-        }
+        mongoose.connect( dbUrl, connectionParams )
+            .then( () => {
+                console.log( 'Connected to database ' )
+            } )
+            .catch( ( err ) => {
+                console.error( `Error connecting to the database. \n${err}` );
+            } );
     }
 
     public listen() {
