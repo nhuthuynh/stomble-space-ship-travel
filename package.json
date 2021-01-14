@@ -24,6 +24,7 @@
     "@types/mongoose": "^5.10.3",
     "dotenv": "^8.2.0",
     "envalid": "^6.0.2",
+    "mongoose-uuid": "0.0.2",
     "sequelize": "^6.3.5",
     "ts-node-dev": "^1.1.1"
   }
