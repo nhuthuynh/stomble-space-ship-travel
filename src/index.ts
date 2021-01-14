@@ -1,11 +1,11 @@
-import express from 'express';
-import { json } from 'body-parser';
-import { spaceShipRouter } from './routes/spaceship';
+import 'dotenv/config';
 
-const app = express();
-app.use(json);
-app.use('/api/space-ship', spaceShipRouter);
+import validateEnv from './utils/validateEnv';
+import App from './App';
+import { SpaceShipController } from './controllers/SpaceShipController';
+import { LocationController } from './controllers/LocationController';
 
-app.listen(3000, () => {
-    console.log('server is listening on port 3000');
-});
+validateEnv();
+
+const app = new App( [new SpaceShipController(), new LocationController()], process.env.PORT );
+app.listen();
