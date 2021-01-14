@@ -1,5 +1,6 @@
 import * as express from 'express';
 import { Request, Response } from 'express';
+import AppError from '../exceptions/AppError';
 
 export abstract class BaseController {
     public baseUrl = 'api';
@@ -29,7 +30,7 @@ export abstract class BaseController {
         return BaseController.jsonResponse( res, 409, message ? message : 'Conflict' );
     }
 
-    public fail( res: Response, error: Error | string ) {
+    public fail( res: Response, error: AppError | string ) {
         console.error( error );
         return res.status( 500 ).json( {
             message: error.toString()
