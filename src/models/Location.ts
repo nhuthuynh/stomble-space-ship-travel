@@ -1,16 +1,15 @@
-import * as mongoose from 'mongoose';
-import { Document, Model, model, Types, Schema, Query } from 'mongoose';
+import { Document, model, Types, Schema } from 'mongoose';
 import { SpaceShipDocument } from './SpaceShip';
-
 
 interface Location {
     cityName: String;
     planetName: String;
     spacePortCapacity: Number;
-    spaceShips?: Types.ObjectId[] | SpaceShipDocument[]
+    spaceShips?: Types.ObjectId[] | SpaceShipDocument[];
 }
 
-interface LocationDocument extends Location, Document { }
+interface LocationDocument extends Location, Document {
+}
 
 const LocationSchemaFields: Record<keyof Location, any> = {
     cityName: {
@@ -34,7 +33,6 @@ const LocationSchemaFields: Record<keyof Location, any> = {
 }
 
 const LocationSchema = new Schema( LocationSchemaFields );
-
 const LocationModel = model<LocationDocument>( 'Location', LocationSchema );
 
 export { LocationModel, Location, LocationDocument }
