@@ -1,15 +1,15 @@
 {
   "name": "space-shipping",
-  "version": "1.0.2",
-  "engines": {
-    "node": "10.x",
-    "npm": "6.x"
-  },
+  "version": "1.0.3",
   "description": "",
   "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nhuthuynh/stomble-space-ship-travel.git"
+  },
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "start": "npm run install && npm run build && npm run serve",
+    "start": "npm install && npm run build && npm run serve",
     "serve": "node dist/index.js",
     "dev": "tsc-watch --onSuccess \"node ./dist/index.js\"",
     "build": "tsc",
