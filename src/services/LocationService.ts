@@ -1,21 +1,25 @@
 import { NextFunction } from "express";
 import { LocationError } from "../exceptions/LocationError";
 import { LocationModel, Location, LocationDocument } from "../models/Location";
+import GeneralService from "./GeneralService";
 
-const LocationService = {
-    getLocationById: async ( id: string | number, next?: NextFunction ): Promise<Location | LocationDocument | null> => {
-        if ( !!id ) {
+class LocationService {
+    private constructor() { }
+
+    public static async getLocationById( id: string | number, next?: NextFunction ): Promise<Location | LocationDocument | null> {
+        if ( !!id && GeneralService.isValideObjectId( id.toString(), next ) ) {
             const location: LocationDocument = await LocationModel.findById( id ).populate( 'spaceShips' );
             if ( location )
                 return location;
             else
                 next && next( LocationError.LocationNotFoundError.create() );
         } else {
-            next && next( LocationError.LocationNotFoundError.create() );
+            next && next( LocationError.LocationIdRequiredError.create() );
         }
         return null;
-    },
-    addLocation: async ( { cityName, planetName, spacePortCapacity = 0 }: Location, next?: NextFunction ): Promise<Location | LocationDocument | null> => {
+    }
+
+    public static async addLocation( { cityName, planetName, spacePortCapacity = 0 }: Location, next?: NextFunction ): Promise<Location | LocationDocument | null> {
         if ( !!cityName && !!planetName && !!spacePortCapacity ) {
             const newLocationModel = new LocationModel( { cityName, planetName, spacePortCapacity } );
             const newSavedLocation = await newLocationModel.save();
@@ -23,8 +27,9 @@ const LocationService = {
         } else {
             next && next( LocationError.LocationInvalidError.create() );
         }
-    },
-    removeLocation: async ( id: string | number, next?: NextFunction ): Promise<boolean> => {
+    }
+
+    public static async removeLocation( id: string | number, next?: NextFunction ): Promise<boolean> {
         const location = await LocationService.getLocationById( id, next ) as LocationDocument;
         if ( location.spaceShips?.length > 0 ) {
             next && next( LocationError.LocationHasSpaceShipsRemoveError.create() );

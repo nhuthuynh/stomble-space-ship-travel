@@ -22,12 +22,12 @@ export namespace LocationError {
     }
 
     export class LocationHasSpaceShipsRemoveError extends AppError {
-        constructor( location?: number | string ) {
+        constructor() {
             super( 400, `Cannot remove location having operational space ships.` );
         }
 
-        public static create( location?: number | string ): LocationHasSpaceShipsRemoveError {
-            return new LocationHasSpaceShipsRemoveError( location );
+        public static create(): LocationHasSpaceShipsRemoveError {
+            return new LocationHasSpaceShipsRemoveError();
         }
     }
 

@@ -1,39 +1,48 @@
 import { NextFunction } from "express";
+import { GeneralError } from "../exceptions/GeneralError";
 import { LocationError } from "../exceptions/LocationError";
 import { SpaceShipError } from "../exceptions/SpaceShipError";
 import { LocationDocument, LocationModel } from "../models/Location";
 import { SpaceShip, SpaceShipDocument, SpaceShipModel, SpaceShipStatus } from "../models/SpaceShip";
+import GeneralService from "./GeneralService";
 import LocationService from "./LocationService";
 
-const SpaceShipService = {
-    isValidSpaceShip: ( { name, spaceShipModel, location: locationId, status }: SpaceShip, next?: NextFunction ): boolean => {
+class SpaceShipService {
+    private contructor() { }
+
+    public static isValidSpaceShip( { name, spaceShipModel, location: locationId, status }: SpaceShip, next?: NextFunction ): boolean {
         if ( !!name && !!spaceShipModel && !!locationId && !!status && SpaceShipService.isValidSpaceShipStatus( status, next ) ) {
-            return true;
+            if ( GeneralService.isValideObjectId( locationId.toString(), next ) ) {
+                return true;
+            }
         } else {
             next && next( SpaceShipError.SpaceShipInvalidError.create() );
         }
         return false;
-    },
-    isValidSpaceShipStatus: ( status: string | number, next?: NextFunction ): boolean => {
+    }
+
+    public static isValidSpaceShipStatus( status: string | number, next?: NextFunction ): boolean {
         const spaceShipStatus = status as SpaceShipStatus;
         if ( spaceShipStatus !== SpaceShipStatus.Decommissioned && spaceShipStatus !== SpaceShipStatus.Maintenance && spaceShipStatus !== SpaceShipStatus.Operational ) {
             next && next( SpaceShipError.SpaceShipStatusNotFoundError.create( Object.values( SpaceShipStatus ).join( ', ' ) ) );
             return false;
         }
         return true;
-    },
-    getTravelableSpaceShipStatus: (): string => {
+    }
+
+    public static getTravelableSpaceShipStatus(): string {
         return Object.keys( SpaceShipStatus ).find( key => SpaceShipStatus[key] == SpaceShipStatus.Operational ? key : '' ) || '';
-    },
-    canTravelStatus: ( status: string | number, next?: NextFunction ): boolean => {
+    }
+
+    public static canTravelStatus( status: string | number, next?: NextFunction ): boolean {
         const spaceShipStatus = status as SpaceShipStatus;
         if ( SpaceShipService.isValidSpaceShipStatus( status ) && spaceShipStatus !== SpaceShipStatus.Operational ) {
             next && next( SpaceShipError.SpaceShipTravelWithInvalidStatusError.create( SpaceShipService.getTravelableSpaceShipStatus() ) );
             return false;
         }
         return true;
-    },
-    getSpaceShips: async ( next?: NextFunction ): Promise<Array<SpaceShip | SpaceShipDocument | null>> => {
+    }
+    public static async getSpaceShips( next?: NextFunction ): Promise<Array<SpaceShip | SpaceShipDocument | null>> {
         const spaceShip: Array<SpaceShip | SpaceShipDocument> = await SpaceShipModel.find();
         if ( spaceShip ) {
             return spaceShip;
@@ -42,9 +51,11 @@ const SpaceShipService = {
             next && next( SpaceShipError.SpaceShipNotFoundError.create() );
         }
         return null;
-    },
-    getSpaceShipById: async ( id: string | number, next?: NextFunction ): Promise<SpaceShip | SpaceShipDocument | null> => {
-        if ( !!id ) {
+    }
+
+    public static async getSpaceShipById( id: string | number, next?: NextFunction ): Promise<SpaceShip | SpaceShipDocument | null> {
+        if ( !!id && GeneralService.isValideObjectId( id.toString(), next ) ) {
+
             const spaceShip: SpaceShip = await SpaceShipModel.findById( id );
             if ( spaceShip ) {
                 return spaceShip;
@@ -56,8 +67,9 @@ const SpaceShipService = {
             next && next( SpaceShipError.SpaceShipIdRequiredError.create() );
         }
         return null;
-    },
-    saveSpaceShip: async ( { name, spaceShipModel, location: locationId, status }: SpaceShip, next?: NextFunction ): Promise<SpaceShip | SpaceShipDocument | null> => {
+    }
+
+    public static async saveSpaceShip( { name, spaceShipModel, location: locationId, status }: SpaceShip, next?: NextFunction ): Promise<SpaceShip | SpaceShipDocument | null> {
         if ( SpaceShipService.isValidSpaceShip( { name, spaceShipModel, location: locationId, status }, next ) ) {
 
             const newSpaceShipModel = new SpaceShipModel( { name, spaceShipModel, location: locationId, status } );
@@ -86,9 +98,10 @@ const SpaceShipService = {
         }
 
         return null;
-    },
-    updateSpaceShipStatus: async ( { id, status }: { id: string; status: string | number; }, next?: NextFunction ): Promise<SpaceShip | SpaceShipDocument | null> => {
-        if ( !!id && SpaceShipService.isValidSpaceShipStatus( status, next ) ) {
+    }
+
+    public static async updateSpaceShipStatus( { id, status }: { id: string; status: string | number; }, next?: NextFunction ): Promise<SpaceShip | SpaceShipDocument | null> {
+        if ( !!id && GeneralService.isValideObjectId( id, next ) && SpaceShipService.isValidSpaceShipStatus( status, next ) ) {
             const spaceShipStatus = status as SpaceShipStatus;
             const updateSpaceShip = await SpaceShipModel.findByIdAndUpdate( id,
                 {
@@ -109,8 +122,9 @@ const SpaceShipService = {
         }
 
         return null;
-    },
-    SpaceShipTravel: async ( { id, location }: { id: string; location: string; }, next?: NextFunction ): Promise<SpaceShip | SpaceShipDocument | null> => {
+    }
+
+    public static async SpaceShipTravel( { id, location }: { id: string; location: string; }, next?: NextFunction ): Promise<SpaceShip | SpaceShipDocument | null> {
         const spaceShip = await SpaceShipService.getSpaceShipById( id, next ) as SpaceShipDocument;
 
         if ( !SpaceShipService.canTravelStatus( spaceShip.status, next ) ) {
@@ -164,8 +178,9 @@ const SpaceShipService = {
         )
         return updateSpaceShip;
 
-    },
-    removeSpaceShip: async ( id: string, next?: NextFunction ): Promise<boolean> => {
+    }
+
+    public static async removeSpaceShip( id: string, next?: NextFunction ): Promise<boolean> {
         const spaceShip = await SpaceShipService.getSpaceShipById( id ) as SpaceShipDocument;
         const location = await LocationService.getLocationById( spaceShip.location.toString() ) as LocationDocument;
         if ( !!spaceShip && !!location ) {
