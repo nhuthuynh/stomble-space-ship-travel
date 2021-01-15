@@ -40,6 +40,11 @@ enum Status {
 }
 
 const SpaceShipSchema = new Schema( SpaceShipSchemaFields );
+SpaceShipSchema.methods.toJSON = function () {
+    const obj = this.toObject();
+    delete obj.__v;
+    return obj;
+}
 
 const SpaceShipModel = model<SpaceShipDocument>( 'SpaceShip', SpaceShipSchema );
 
