@@ -1,15 +1,21 @@
 {
   "name": "space-shipping",
   "version": "1.0.2",
+  "engines": {
+    "node": "10.x",
+    "npm": "6.x"
+  },
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "start": "npm run build && npm run serve",
+    "start": "npm run install && npm run build && npm run serve",
     "serve": "node dist/index.js",
     "dev": "tsc-watch --onSuccess \"node ./dist/index.js\"",
     "build": "tsc",
-    "postinstall": "npm start"
+    "heroku-prebuild": "echo This runs before Heroku installs dependencies.",
+    "heroku-postbuild": "echo This runs after Heroku installs dependencies, but before Heroku prunes and caches dependencies.",
+    "heroku-cleanup": "echo This runs after Heroku prunes and caches dependencies."
   },
   "keywords": [
     "node",
