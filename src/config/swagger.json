@@ -101,84 +101,226 @@
                 "content": {
                     "application/json": {}
                 }
-            },
-            "/:id": {
-                "get": {
-                    "tags": [
-                        "get location by id"
-                    ],
-                    "summary": "Fetch a location by id.",
-                    "responses": {
-                        "200": {
-                            "spacePortCapacity": 0,
-                            "spaceShips": [
-                                {
-                                    "status": 2,
-                                    "_id": "60004f1caa327411e3fefed5",
-                                    "name": "Audi",
-                                    "spaceShipModel": "S11",
-                                    "location": "60004de3eb192611872f3356",
-                                    "__v": 0
-                                }
-                            ],
-                            "_id": "60004de3eb192611872f3356",
-                            "cityName": "Melbourne",
-                            "planetName": "Earth",
-                            "__v": 0
-                        }
+            }
+        },
+        "location/:id": {
+            "get": {
+                "tags": [
+                    "get location by id"
+                ],
+                "summary": "Fetch a location by id.",
+                "responses": {
+                    "200": {
+                        "spacePortCapacity": 0,
+                        "spaceShips": [
+                            {
+                                "status": 2,
+                                "_id": "60004f1caa327411e3fefed5",
+                                "name": "Audi",
+                                "spaceShipModel": "S11",
+                                "location": "60004de3eb192611872f3356",
+                                "__v": 0
+                            }
+                        ],
+                        "_id": "60004de3eb192611872f3356",
+                        "cityName": "Melbourne",
+                        "planetName": "Earth",
+                        "__v": 0
                     },
-                    "content": {
-                        "application/json": {}
+                    "404": {
+                        "message": "Location not found"
                     },
-                    "parameters": {
-                        "id": "60004de3eb192611872f3356"
+                    "400": {
+                        "message": [
+                            "Id is invalid"
+                        ]
                     }
                 },
-                "del": {
-                    "tags": [
-                        "remove location"
-                    ],
-                    "summary": "Remove location, a location can be removed when it has no space ship.",
-                    "responses": {
-                        "200": {
-                            "message": "Remove location 6000f561491eb838faa77758 successfully."
-                        }
-                    },
-                    "content": {
-                        "application/json": {}
-                    },
-                    "parameters": {
-                        "id": "6000f561491eb838faa77758"
+                "content": {
+                    "application/json": {}
+                },
+                "parameters": {
+                    "id": "60004de3eb192611872f3356"
+                }
+            },
+            "del": {
+                "tags": [
+                    "remove location"
+                ],
+                "summary": "Remove location, a location can be removed when it has no space ship.",
+                "responses": {
+                    "200": {
+                        "message": "Remove location 6000f561491eb838faa77758 successfully."
                     }
+                },
+                "content": {
+                    "application/json": {}
+                },
+                "parameters": {
+                    "id": "6000f561491eb838faa77758"
                 }
             }
         },
         "/space-ships": {
             "get": {
                 "tags": [
-                    "Fetch Profile"
+                    "Fetch all space ships"
                 ],
-                "summary": "Fetch login user profile",
+                "summary": "Fetch available space ship",
                 "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
+                    "200": [
+                        {
+                            "status": 1,
+                            "_id": "60004dc4eb192611872f3355",
+                            "name": "BMW",
+                            "spaceShipModel": "S12",
+                            "location": "60002ce12fd7810b2319112f",
+                            "__v": 0
+                        },
+                        {
+                            "status": 1,
+                            "_id": "60004f1caa327411e3fefed5",
+                            "name": "Audi",
+                            "spaceShipModel": "S11",
+                            "location": "60004de3eb192611872f3356",
+                            "__v": 0
+                        },
+                        {
+                            "status": 2,
+                            "_id": "60006c086cc54c19cff3322a",
+                            "name": "Audi",
+                            "spaceShipModel": "S01",
+                            "location": "60002ce12fd7810b2319112f",
+                            "__v": 0
+                        },
+                        {
+                            "status": 2,
+                            "_id": "60006c606cc54c19cff3322b",
+                            "name": "Audi",
+                            "spaceShipModel": "S02",
+                            "location": "60004de3eb192611872f3356",
+                            "__v": 0
+                        }
+                    ],
                     "400": {
                         "description": "Bad request"
                     }
                 },
                 "content": {
                     "application/json": {}
-                },
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "description": "Specifies the query string as name",
-                        "required": true,
-                        "type": "string"
+                }
+            },
+            "post": {
+                "tags": [
+                    "add new space ship"
+                ],
+                "summary": "add new space ship, can only add a space ship to a location with spacePortCapacity greater than 0",
+                "responses": {
+                    "200": {
+                        "status": 2,
+                        "_id": "600119421a72ce46576a64ce",
+                        "name": "Toyota T01",
+                        "spaceShipModel": "T01",
+                        "location": "60002ce12fd7810b2319112f"
                     }
-                ]
+                },
+                "body": {
+                    "name": "Toyota T01",
+                    "spaceShipModel": "T01",
+                    "location": "60002ce12fd7810b2319112f",
+                    "status": 2
+                }
+            },
+            "put": {
+                "tags": [
+                    "change space ship status"
+                ],
+                "summary": "Change space ship status, 0 value is Decommissioned, 1 value is Maintenance, 2 value is Operational.",
+                "responses": {
+                    "200": {
+                        "status": 2,
+                        "_id": "6000f576491eb838faa77759",
+                        "name": "Audi S01",
+                        "spaceShipModel": "S01",
+                        "location": "60004de3eb192611872f3356"
+                    },
+                    "400": {
+                        "message": "Space ship status is not correct, required one of these values: 0 value is Decommissioned, 1 value is Maintenance, 2 value is Operational"
+                    }
+                },
+                "body": {
+                    "id": "6000f576491eb838faa77759",
+                    "status": 2
+                }
+            }
+        },
+        "space-ships/travel": {
+            "put": {
+                "tags": [
+                    "space-ships",
+                    "travel",
+                    "change location"
+                ],
+                "summary": "Change location of a space ship, adjust capacity of source and destination location, a space ship with status operational can travel and can travel to a location with capacity large than 0",
+                "responses": {
+                    "200": {
+                        "status": 2,
+                        "_id": "6000f576491eb838faa77759",
+                        "name": "Audi S01",
+                        "spaceShipModel": "S01",
+                        "location": "60004de3eb192611872f3356"
+                    }
+                },
+                "body": {
+                    "id": "6000f576491eb838faa77759",
+                    "location": "60004de3eb192611872f3356"
+                },
+                "content": {
+                    "application/json": {}
+                }
+            }
+        },
+        "space-ships/:id": {
+            "get": {
+                "tags": [
+                    "space-ships",
+                    "fetch"
+                ],
+                "summary": "Fetch space ship information by id",
+                "responses": {
+                    "200": {
+                        "status": 1,
+                        "_id": "60004f1caa327411e3fefed5",
+                        "name": "Audi",
+                        "spaceShipModel": "S11",
+                        "location": "60004de3eb192611872f3356",
+                        "__v": 0
+                    }
+                },
+                "content": {
+                    "application/json": {}
+                },
+                "parameters": {
+                    "id": "60004f1caa327411e3fefed5"
+                }
+            },
+            "delete": {
+                "tags": [
+                    "space-ships",
+                    "remove"
+                ],
+                "summary": "Remove space ship by id",
+                "responses": {
+                    "200": {
+                        "message": "Remove space ship 60006c086cc54c19cff3322a successfully."
+                    }
+                },
+                "content": {
+                    "application/json": {}
+                },
+                "parameters": {
+                    "id": "60006c086cc54c19cff3322a"
+                }
             }
         }
     }
