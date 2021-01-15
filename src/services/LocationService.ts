@@ -25,7 +25,7 @@ const LocationService = {
         }
     },
     removeLocation: async ( id: string | number, next?: NextFunction ): Promise<boolean> => {
-        const location = await LocationService.getLocationById( id ) as LocationDocument;
+        const location = await LocationService.getLocationById( id, next ) as LocationDocument;
         if ( location.spaceShips?.length > 0 ) {
             next && next( LocationError.LocationHasSpaceShipsRemoveError.create() );
             return false;
