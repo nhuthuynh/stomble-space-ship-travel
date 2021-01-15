@@ -35,10 +35,6 @@ const LocationSchemaFields: Record<keyof Location, any> = {
 const LocationSchema = new Schema( LocationSchemaFields );
 LocationSchema.methods.toJSON = function () {
     const obj = this.toObject();
-    obj.spaceShips = obj.spaceShips.map( spaceShip => {
-        delete spaceShip.__v;
-        return spaceShip;
-    } );
     delete obj.__v;
     return obj;
 }
