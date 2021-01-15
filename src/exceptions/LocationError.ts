@@ -33,7 +33,7 @@ export namespace LocationError {
 
     export class LocationIdRequiredError extends AppError {
         constructor() {
-            super( 404, `Location id is required.` );
+            super( 400, `Location id is required.` );
         }
 
         public static create(): LocationIdRequiredError {
@@ -43,7 +43,7 @@ export namespace LocationError {
 
     export class LocationRemoveError extends AppError {
         constructor( message?: string ) {
-            super( 404, `Cannot delete the location ${message}` );
+            super( 400, `Cannot delete the location ${message}` );
         }
 
         public static create( message?: string ): LocationRemoveError {
