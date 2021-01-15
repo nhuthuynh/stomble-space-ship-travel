@@ -1,7 +1,8 @@
 import * as express from 'express';
-import { Request, Response, Router } from 'express';
-import { LocationModel, Location } from '../models/Location';
+import { NextFunction, Request, Response, Router } from 'express';
+import { LocationModel, Location, LocationDocument } from '../models/Location';
 import { BaseController } from './BaseController';
+import LocationService from '../services/LocationService';
 
 export class LocationController extends BaseController {
     public path: string;
@@ -9,7 +10,7 @@ export class LocationController extends BaseController {
 
     constructor() {
         super();
-        this.path = `/location`;
+        this.path = `/locations`;
         this.router = Router();
         this.initializeRoutes();
     }
@@ -18,42 +19,31 @@ export class LocationController extends BaseController {
         this.router.get( this.path, this.getLocations );
         this.router.get( `${this.path}/:id`, this.getLocationById );
         this.router.post( this.path, this.addLocation );
-        this.router.put( this.path, this.updateLocation );
         this.router.delete( `${this.path}/:id`, this.removeLocation );
     }
 
     getLocations = async ( req: Request, res: Response ): Promise<any> => {
-        const locations = await LocationModel.find();
-        return this.ok<any>( res, locations );
+        const locations: Array<LocationDocument> = await LocationModel.find().populate( 'spaceShips' );
+        return this.ok<Array<LocationDocument>>( res, locations );
     }
 
-    getLocationById = ( req: Request, res: Response ) => {
+    getLocationById = async ( req: Request, res: Response, next: NextFunction ) => {
         const { id } = req.params;
 
-        if ( !!id ) {
-            return this.ok<any>( res );
-        } else {
-            return this.fail( res, 'Location id is required!' );
-        }
+        const location: Location = await LocationService.getLocationById( id, next );
+        return !!location ? this.ok<Location>( res, location ) : this.clientError( res );
     }
 
-    removeLocation = ( req: Request, res: Response ) => {
-        return this.ok<any>( res );
+    removeLocation = async ( req: Request, res: Response, next: NextFunction ) => {
+        const { id } = req.params;
+
+        const success = await LocationService.removeLocation( id, next );
+        return success ? this.ok<any>( res, { message: `Remove location ${id} successfully.` } ) : this.clientError( res );
     }
 
-    addLocation = async ( req: Request, res: Response ) => {
+    addLocation = async ( req: Request, res: Response, next: NextFunction ) => {
         const { cityName, planetName, spacePortCapacity } = req.body;
-        if ( !!cityName && !!planetName && !!spacePortCapacity ) {
-            const newLocation: Location = { cityName, planetName, spacePortCapacity };
-            const newLocationModel = new LocationModel( { ...newLocation } );
-            await newLocationModel.save();
-            return this.ok<Location>( res, newLocation );
-        } else {
-            return this.fail( res, 'City name, planet name and space port capacity are required!' );
-        }
-    }
-
-    updateLocation = ( req: Request, res: Response ) => {
-        return this.ok<any>( res );
+        const location = await LocationService.addLocation( { cityName, planetName, spacePortCapacity }, next );
+        return !!location ? this.ok<Location>( res, location ) : this.clientError( res );
     }
 }
