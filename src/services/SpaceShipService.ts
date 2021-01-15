@@ -1,9 +1,9 @@
 import { NextFunction } from "express";
-import { GeneralError } from "../exceptions/GeneralError";
 import { LocationError } from "../exceptions/LocationError";
 import { SpaceShipError } from "../exceptions/SpaceShipError";
 import { LocationDocument, LocationModel } from "../models/Location";
 import { SpaceShip, SpaceShipDocument, SpaceShipModel, SpaceShipStatus } from "../models/SpaceShip";
+import utils from "../utils/utils";
 import GeneralService from "./GeneralService";
 import LocationService from "./LocationService";
 
@@ -24,7 +24,7 @@ class SpaceShipService {
     public static isValidSpaceShipStatus( status: string | number, next?: NextFunction ): boolean {
         const spaceShipStatus = status as SpaceShipStatus;
         if ( spaceShipStatus !== SpaceShipStatus.Decommissioned && spaceShipStatus !== SpaceShipStatus.Maintenance && spaceShipStatus !== SpaceShipStatus.Operational ) {
-            next && next( SpaceShipError.SpaceShipStatusNotFoundError.create( Object.values( SpaceShipStatus ).join( ', ' ) ) );
+            next && next( SpaceShipError.SpaceShipStatusNotFoundError.create( utils.getValuesFromEnum( SpaceShipStatus ).map( ( key: any ) => `${SpaceShipStatus[key]} value is ${key}` ).join( ', ' ) ) );
             return false;
         }
         return true;
@@ -78,6 +78,7 @@ class SpaceShipService {
 
             if ( location.spacePortCapacity === 0 ) {
                 next( LocationError.LocationPortCapacityFullError.create( locationId.toString() ) );
+                return null;
             }
 
             const portCapacity: any = location.spacePortCapacity;
@@ -186,7 +187,7 @@ class SpaceShipService {
         if ( !!spaceShip && !!location ) {
 
             const locationCapacity: any = location.spacePortCapacity;
-            await LocationModel.findByIdAndUpdate( location._id, {
+            const success = await LocationModel.findByIdAndUpdate( location._id, {
                 $set: {
                     spacePortCapacity: locationCapacity + 1
                 },
@@ -195,8 +196,7 @@ class SpaceShipService {
                 }
             },
                 { new: true, useFindAndModify: false } );
-            await SpaceShipModel.deleteOne( { '_id': spaceShip._id } )
-            return true;
+            return success ? await SpaceShipModel.deleteOne( { '_id': spaceShip._id } ) : false;
         }
         return false;
     }
