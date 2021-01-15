@@ -3,7 +3,7 @@
     "info": {
         "version": "1.0.0"
     },
-    "host": "localhost:3000",
+    "host": "https://stomble-space-ship-travel.herokuapp.com",
     "basePath": "/api/",
     "schemes": [
         "http"
