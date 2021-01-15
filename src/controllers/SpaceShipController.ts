@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { NextFunction, Request, Response, Router } from 'express';
-import { SpaceShip, SpaceShipDocument, SpaceShipModel, SpaceShipStatus } from '../models/SpaceShip';
+import { SpaceShip } from '../models/SpaceShip';
 import { BaseController } from './BaseController';
 import SpaceShipService from '../services/SpaceShipService';
 
@@ -33,31 +33,30 @@ export class SpaceShipController extends BaseController {
         const { id } = req.params;
 
         const spaceShip: SpaceShip = await SpaceShipService.getSpaceShipById( id, next );
-        return !!spaceShip ? this.ok<SpaceShip>( res, spaceShip ) : this.clientError( res );
-
+        !!spaceShip && this.ok<SpaceShip>( res, spaceShip );
     }
 
     addSpaceShip = async ( req: Request, res: Response, next: NextFunction ) => {
-        const { name, spaceShipModel, locationId, status } = req.body;
-        const spaceShip = await SpaceShipService.saveSpaceShip( { name, spaceShipModel, location: locationId, status }, next );
-        return !!spaceShip ? this.ok<SpaceShip>( res, spaceShip ) : this.clientError( res );
+        const { name, spaceShipModel, location, status } = req.body;
+        const spaceShip = await SpaceShipService.saveSpaceShip( { name, spaceShipModel, location, status }, next );
+        !!spaceShip && this.ok<any>( res, spaceShip );
     }
 
     updateSpaceShip = async ( req: Request, res: Response, next: NextFunction ) => {
         const { id, status } = req.body;
         const updatedSpaceShip = await SpaceShipService.updateSpaceShipStatus( { id, status }, next );
-        return !!updatedSpaceShip ? this.ok<SpaceShip>( res, updatedSpaceShip ) : this.clientError( res );
+        !!updatedSpaceShip && this.ok<SpaceShip>( res, updatedSpaceShip );
     }
 
     spaceShipTravel = async ( req: Request, res: Response, next: NextFunction ) => {
         const { id, location } = req.body;
         const updatedSpaceShip = await SpaceShipService.SpaceShipTravel( { id, location }, next );
-        return !!updatedSpaceShip ? this.ok<SpaceShip>( res, updatedSpaceShip ) : this.clientError( res );
+        !!updatedSpaceShip && this.ok<SpaceShip>( res, updatedSpaceShip );
     }
 
     removeSpaceShip = async ( req: Request, res: Response, next: NextFunction ) => {
         const { id } = req.params;
         const success = await SpaceShipService.removeSpaceShip( id, next );
-        return success ? this.ok<any>( res, { message: `Remove space ship ${id} successfully.` } ) : this.clientError( res );
+        success && this.ok<any>( res, { message: `Remove space ship ${id} successfully.` } );
     }
 }

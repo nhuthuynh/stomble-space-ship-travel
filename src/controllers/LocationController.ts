@@ -31,19 +31,20 @@ export class LocationController extends BaseController {
         const { id } = req.params;
 
         const location: Location = await LocationService.getLocationById( id, next );
-        return !!location ? this.ok<Location>( res, location ) : this.clientError( res );
+        !!location && this.ok<Location>( res, location );
     }
 
     removeLocation = async ( req: Request, res: Response, next: NextFunction ) => {
         const { id } = req.params;
 
         const success = await LocationService.removeLocation( id, next );
-        return success ? this.ok<any>( res, { message: `Remove location ${id} successfully.` } ) : this.clientError( res );
+
+        success && this.ok<any>( res, { message: `Remove location ${id} successfully.` } );
     }
 
     addLocation = async ( req: Request, res: Response, next: NextFunction ) => {
         const { cityName, planetName, spacePortCapacity } = req.body;
         const location = await LocationService.addLocation( { cityName, planetName, spacePortCapacity }, next );
-        return !!location ? this.ok<Location>( res, location ) : this.clientError( res );
+        !!location && this.ok<Location>( res, location );
     }
 }
