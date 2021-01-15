@@ -21,13 +21,13 @@ export namespace LocationError {
         }
     }
 
-    export class LocationHasSpaceShipsDeleteError extends AppError {
+    export class LocationHasSpaceShipsRemoveError extends AppError {
         constructor( location?: number | string ) {
-            super( 400, `Cannot delete location having operational space ships.` );
+            super( 400, `Cannot remove location having operational space ships.` );
         }
 
-        public static create( location?: number | string ): LocationNotFoundError {
-            return new LocationNotFoundError( location );
+        public static create( location?: number | string ): LocationHasSpaceShipsRemoveError {
+            return new LocationHasSpaceShipsRemoveError( location );
         }
     }
 
@@ -48,6 +48,16 @@ export namespace LocationError {
 
         public static create( message?: string ): LocationRemoveError {
             return new LocationRemoveError( message );
+        }
+    }
+
+    export class LocationInvalidError extends AppError {
+        constructor() {
+            super( 400, `Location data is invalid; city name, planet name and space sport capacity are required.` );
+        }
+
+        public static create(): LocationInvalidError {
+            return new LocationInvalidError();
         }
     }
 }
