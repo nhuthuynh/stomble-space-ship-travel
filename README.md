@@ -11,4 +11,4 @@ The followings are functionalities of this project.
 * The spaceport capacity of the destination (if not, return an appropriate error).
 * The status of the spaceship (only operational spaceships can travel).
 
-APIDOCS[APIDOCS](https://stomble-space-ship-travel.herokuapp.com/api-docs)
+[APIDOCS](https://stomble-space-ship-travel.herokuapp.com/api-docs)
